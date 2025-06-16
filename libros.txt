@@ -1,5 +1,27 @@
-1
-lsd lsdfg
-sldkfg
-32323
+Julio Verne
+456
+0
+
+Gabriel García Márquez
+789
+0
+
+Miguel de Cervantes
+101
+0
+
+Antoine de Saint-Exupéry
+102
+0
+
+Fiódor Dostoyevski
+103
+0
+
+Jane Austen
+104
+0
+
+George Orwell
+105
 0

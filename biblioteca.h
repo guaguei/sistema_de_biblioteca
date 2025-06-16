@@ -2,7 +2,6 @@
 #define BIBLIOTECA_H
 
 // --- Constantes ---
-#define MAX_LIBROS 100 // Número máximo de libros que puede almacenar el sistema
 #define MAX_STR 100    // Longitud máxima para cadenas (títulos, autores, códigos)
 #define FILENAME "libros.txt" // Nombre del archivo para guardar/cargar datos
 
@@ -15,17 +14,21 @@ typedef struct {
 	int estado;
 } Libro;
 
+// --- Estructura para un Nodo de la Lista Enlazada ---
+typedef struct NodoLibro {
+	Libro datos;
+	struct NodoLibro *siguiente;
+} NodoLibro;
+
 // --- Prototipos de Funciones ---
 // Funciones principales del sistema de biblioteca
+void inicializar_sistema(); // Carga los datos al inicio y inicializa la lista
 void registrar_libro();
 void prestar_devolver_libro(int es_prestamo); // 1 para prestar, 0 para devolver
 void buscar_libro();
 void listar_libros();
-void guardar_datos();
-void cargar_datos();
+void guardar_datos(); // Guarda los datos de la lista enlazada
 void gestionar_prestamos_activos();
-
-// Prototipo de la función de inicialización, si es necesario
-void inicializar_sistema();
+void liberar_memoria(); // Libera la memoria de la lista enlazada al salir
 
 #endif // BIBLIOTECA_H

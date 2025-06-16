@@ -1,104 +1,140 @@
 #include "biblioteca.h" // Incluye la cabecera con definiciones y prototipos
 #include <stdio.h>      // Para entrada/salida (printf, scanf, fopen, fclose, etc.)
-#include <stdlib.h>     // Para funciones generales (qsort)
+#include <stdlib.h>     // Para funciones generales (malloc, free, qsort, exit)
 #include <string.h>     // Para manipulación de cadenas (strcpy, strcmp, strstr, strcspn)
 
-// --- Variables Globales (Privadas a biblioteca.c, pero usadas por sus funciones) ---
-// Se declaran aquí porque son parte del estado interno de la implementación de la biblioteca
-Libro biblioteca[MAX_LIBROS];
-int num_libros = 0; // Contador de libros actualmente en la biblioteca
+// --- Variable Global para la cabeza de la Lista Enlazada ---
+static NodoLibro *lista_libros = NULL; // Puntero al primer nodo de la lista
+static int num_libros_actual = 0; // Contador de libros para guardar/cargar y otras operaciones
 
-// --- Funciones Auxiliares (no se exponen en el .h) ---
+// --- Prototipos de Funciones Auxiliares (privadas a este archivo) ---
+// Es fundamental declarar estas funciones antes de que sean usadas.
+static void limpiar_buffer();
+static void agregar_libro_a_lista(Libro nuevo_libro);
+static NodoLibro* buscar_nodo_por_codigo(const char *codigo);
+static int comparar_por_titulo(const void *a, const void *b);
+static int comparar_por_autor(const void *a, const void *b);
+static void cargar_datos(); // <-- ¡Aquí está la solución para la advertencia!
+
+// --- Implementación de Funciones Auxiliares ---
 static void limpiar_buffer() {
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Función de comparación para qsort (ordenar por título)
+static void agregar_libro_a_lista(Libro nuevo_libro) {
+	NodoLibro *nuevo_nodo = (NodoLibro *)malloc(sizeof(NodoLibro));
+	if (nuevo_nodo == NULL) {
+		printf("ERROR: No hay suficiente memoria para agregar el libro.\n");
+		exit(EXIT_FAILURE); // Salir si no se puede asignar memoria
+	}
+	
+	nuevo_nodo->datos = nuevo_libro;
+	nuevo_nodo->siguiente = NULL;
+	
+	if (lista_libros == NULL) { // Si la lista está vacía
+		lista_libros = nuevo_nodo;
+	} else { // Recorrer hasta el final y añadir
+		NodoLibro *actual = lista_libros;
+		while (actual->siguiente != NULL) {
+			actual = actual->siguiente;
+		}
+		actual->siguiente = nuevo_nodo;
+	}
+	num_libros_actual++;
+}
+
+static NodoLibro* buscar_nodo_por_codigo(const char *codigo) {
+	NodoLibro *actual = lista_libros;
+	while (actual != NULL) {
+		if (strcmp(actual->datos.codigo, codigo) == 0) {
+			return actual;
+		}
+		actual = actual->siguiente;
+	}
+	return NULL; // No encontrado
+}
+
 static int comparar_por_titulo(const void *a, const void *b) {
 	Libro *libroA = (Libro *)a;
 	Libro *libroB = (Libro *)b;
 	return strcmp(libroA->titulo, libroB->titulo);
 }
 
-// Función de comparación para qsort (ordenar por autor)
 static int comparar_por_autor(const void *a, const void *b) {
 	Libro *libroA = (Libro *)a;
 	Libro *libroB = (Libro *)b;
 	return strcmp(libroA->autor, libroB->autor);
 }
 
+
 // --- Implementación de Funciones Públicas (desde biblioteca.h) ---
 
-// Función para inicializar el sistema (cargar datos al inicio)
 void inicializar_sistema() {
-	cargar_datos();
+	cargar_datos(); // La llamada a cargar_datos() ahora está bien porque su prototipo está arriba
 }
 
 void registrar_libro() {
-	if (num_libros >= MAX_LIBROS) {
-		printf("ERROR: La biblioteca esta llena. No se pueden agregar mas libros.\n");
-		return;
-	}
+	// ... (resto de la función igual) ...
+	Libro nuevo_libro;
 	
 	printf("\n--- Registrar Nuevo Libro ---\n");
 	printf("Titulo: ");
-	fgets(biblioteca[num_libros].titulo, MAX_STR, stdin);
-	biblioteca[num_libros].titulo[strcspn(biblioteca[num_libros].titulo, "\n")] = 0; // Eliminar el salto de linea
+	fgets(nuevo_libro.titulo, MAX_STR, stdin);
+	nuevo_libro.titulo[strcspn(nuevo_libro.titulo, "\n")] = 0; // Eliminar el salto de linea
 	
 	printf("Autor: ");
-	fgets(biblioteca[num_libros].autor, MAX_STR, stdin);
-	biblioteca[num_libros].autor[strcspn(biblioteca[num_libros].autor, "\n")] = 0; // Eliminar el salto de linea
+	fgets(nuevo_libro.autor, MAX_STR, stdin);
+	nuevo_libro.autor[strcspn(nuevo_libro.autor, "\n")] = 0; // Eliminar el salto de linea
 	
 	printf("Codigo (unico): ");
-	fgets(biblioteca[num_libros].codigo, MAX_STR, stdin);
-	biblioteca[num_libros].codigo[strcspn(biblioteca[num_libros].codigo, "\n")] = 0; // Eliminar el salto de linea
+	fgets(nuevo_libro.codigo, MAX_STR, stdin);
+	nuevo_libro.codigo[strcspn(nuevo_libro.codigo, "\n")] = 0; // Eliminar el salto de linea
 	
-	biblioteca[num_libros].estado = 0; // 0 = Disponible por defecto
+	nuevo_libro.estado = 0; // 0 = Disponible por defecto
 	
-	num_libros++;
+	agregar_libro_a_lista(nuevo_libro);
 	printf("Libro registrado exitosamente.\n");
 }
 
 void prestar_devolver_libro(int es_prestamo) {
+	// ... (resto de la función igual) ...
 	char codigo_buscar[MAX_STR];
-	int encontrado = 0;
+	NodoLibro *libro_encontrado;
 	
 	printf("\n--- %s Libro ---\n", es_prestamo ? "Prestar" : "Devolver");
 	printf("Ingrese el codigo del libro: ");
 	fgets(codigo_buscar, MAX_STR, stdin);
 	codigo_buscar[strcspn(codigo_buscar, "\n")] = 0;
 	
-	for (int i = 0; i < num_libros; i++) {
-		if (strcmp(biblioteca[i].codigo, codigo_buscar) == 0) {
-			if (es_prestamo) {
-				if (biblioteca[i].estado == 0) { // Si esta disponible
-					biblioteca[i].estado = 1; // Marcar como prestado
-					printf("Libro '%s' (Codigo: %s) prestado exitosamente.\n", biblioteca[i].titulo, biblioteca[i].codigo);
-				} else {
-					printf("El libro '%s' ya se encuentra prestado.\n", biblioteca[i].titulo);
-				}
-			} else { // Es devolver
-				if (biblioteca[i].estado == 1) { // Si esta prestado
-					biblioteca[i].estado = 0; // Marcar como disponible
-					printf("Libro '%s' (Codigo: %s) devuelto exitosamente.\n", biblioteca[i].titulo, biblioteca[i].codigo);
-				} else {
-					printf("El libro '%s' ya se encuentra disponible.\n", biblioteca[i].titulo);
-				}
-			}
-			encontrado = 1;
-			break;
-		}
-	}
+	libro_encontrado = buscar_nodo_por_codigo(codigo_buscar);
 	
-	if (!encontrado) {
+	if (libro_encontrado != NULL) {
+		if (es_prestamo) {
+			if (libro_encontrado->datos.estado == 0) { // Si esta disponible
+				libro_encontrado->datos.estado = 1; // Marcar como prestado
+				printf("Libro '%s' (Codigo: %s) prestado exitosamente.\n", libro_encontrado->datos.titulo, libro_encontrado->datos.codigo);
+			} else {
+				printf("El libro '%s' ya se encuentra prestado.\n", libro_encontrado->datos.titulo);
+			}
+		} else { // Es devolver
+			if (libro_encontrado->datos.estado == 1) { // Si esta prestado
+				libro_encontrado->datos.estado = 0; // Marcar como disponible
+				printf("Libro '%s' (Codigo: %s) devuelto exitosamente.\n", libro_encontrado->datos.titulo, libro_encontrado->datos.codigo);
+			} else {
+				printf("El libro '%s' ya se encuentra disponible.\n", libro_encontrado->datos.titulo);
+			}
+		}
+	} else {
 		printf("Libro con codigo '%s' no encontrado.\n", codigo_buscar);
 	}
 }
 
 void buscar_libro() {
+	// ... (resto de la función igual) ...
 	char termino_busqueda[MAX_STR];
 	int encontrado = 0;
+	NodoLibro *actual = lista_libros;
 	
 	printf("\n--- Buscar Libro ---\n");
 	printf("Ingrese el titulo o autor a buscar: ");
@@ -106,14 +142,15 @@ void buscar_libro() {
 	termino_busqueda[strcspn(termino_busqueda, "\n")] = 0;
 	
 	printf("\nResultados de la busqueda:\n");
-	for (int i = 0; i < num_libros; i++) {
-		if (strstr(biblioteca[i].titulo, termino_busqueda) != NULL ||
-			strstr(biblioteca[i].autor, termino_busqueda) != NULL) {
+	while (actual != NULL) {
+		if (strstr(actual->datos.titulo, termino_busqueda) != NULL ||
+			strstr(actual->datos.autor, termino_busqueda) != NULL) {
 			printf("  Titulo: %s, Autor: %s, Codigo: %s, Estado: %s\n",
-				   biblioteca[i].titulo, biblioteca[i].autor, biblioteca[i].codigo,
-				   biblioteca[i].estado == 0 ? "Disponible" : "Prestado");
+				   actual->datos.titulo, actual->datos.autor, actual->datos.codigo,
+				   actual->datos.estado == 0 ? "Disponible" : "Prestado");
 			encontrado = 1;
 		}
+		actual = actual->siguiente;
 	}
 	
 	if (!encontrado) {
@@ -122,7 +159,8 @@ void buscar_libro() {
 }
 
 void listar_libros() {
-	if (num_libros == 0) {
+	// ... (resto de la función igual) ...
+	if (lista_libros == NULL) {
 		printf("No hay libros registrados en la biblioteca.\n");
 		return;
 	}
@@ -136,83 +174,123 @@ void listar_libros() {
 	scanf("%d", &opcion_orden);
 	limpiar_buffer(); // Limpiar el buffer después de leer un entero
 	
+	Libro *temp_array = (Libro *)malloc(num_libros_actual * sizeof(Libro));
+	if (temp_array == NULL) {
+		printf("ERROR: No hay suficiente memoria para ordenar los libros.\n");
+		return;
+	}
+	
+	NodoLibro *actual = lista_libros;
+	for (int i = 0; i < num_libros_actual; i++) {
+		temp_array[i] = actual->datos;
+		actual = actual->siguiente;
+	}
+	
 	if (opcion_orden == 1) {
-		qsort(biblioteca, num_libros, sizeof(Libro), comparar_por_titulo);
+		qsort(temp_array, num_libros_actual, sizeof(Libro), comparar_por_titulo);
 		printf("\nLibros listados por Titulo:\n");
 	} else if (opcion_orden == 2) {
-		qsort(biblioteca, num_libros, sizeof(Libro), comparar_por_autor);
+		qsort(temp_array, num_libros_actual, sizeof(Libro), comparar_por_autor);
 		printf("\nLibros listados por Autor:\n");
 	} else {
 		printf("Opcion de ordenamiento invalida. Mostrando sin ordenar.\n");
 	}
 	
-	for (int i = 0; i < num_libros; i++) {
-		printf("  Titulo: %s\n", biblioteca[i].titulo);
-		printf("  Autor: %s\n", biblioteca[i].autor);
-		printf("  Codigo: %s\n", biblioteca[i].codigo);
-		printf("  Estado: %s\n", biblioteca[i].estado == 0 ? "Disponible" : "Prestado");
+	for (int i = 0; i < num_libros_actual; i++) {
+		printf("  Titulo: %s\n", temp_array[i].titulo);
+		printf("  Autor: %s\n", temp_array[i].autor);
+		printf("  Codigo: %s\n", temp_array[i].codigo);
+		printf("  Estado: %s\n", temp_array[i].estado == 0 ? "Disponible" : "Prestado");
 		printf("--------------------\n");
 	}
+	
+	free(temp_array); // Liberar la memoria del arreglo temporal
 }
 
 void guardar_datos() {
-	FILE *fp = fopen(FILENAME, "w"); // Abrir en modo escritura (sobrescribe si existe)
+	// ... (resto de la función igual) ...
+	FILE *fp = fopen(FILENAME, "w");
 	if (fp == NULL) {
 		printf("ERROR: No se pudo abrir el archivo para guardar datos.\n");
 		return;
 	}
 	
-	fprintf(fp, "%d\n", num_libros); // Guardar el número de libros primero
-	for (int i = 0; i < num_libros; i++) {
+	fprintf(fp, "%d\n", num_libros_actual);
+	NodoLibro *actual = lista_libros;
+	while (actual != NULL) {
 		fprintf(fp, "%s\n%s\n%s\n%d\n",
-				biblioteca[i].titulo,
-				biblioteca[i].autor,
-				biblioteca[i].codigo,
-				biblioteca[i].estado);
+				actual->datos.titulo,
+				actual->datos.autor,
+				actual->datos.codigo,
+				actual->datos.estado);
+		actual = actual->siguiente;
 	}
 	
 	fclose(fp);
 	printf("Datos guardados exitosamente en %s.\n", FILENAME);
 }
 
-void cargar_datos() {
-	FILE *fp = fopen(FILENAME, "r"); // Abrir en modo lectura
+static void cargar_datos() { // <-- Ahora es static aquí, como una función auxiliar
+	FILE *fp = fopen(FILENAME, "r");
 	if (fp == NULL) {
 		printf("Advertencia: No se encontraron datos previos (%s). Iniciando con biblioteca vacia.\n", FILENAME);
-		num_libros = 0; // Asegurarse de que el contador de libros esté a 0
+		num_libros_actual = 0;
 		return;
 	}
 	
-	fscanf(fp, "%d\n", &num_libros); // Leer el número de libros
-	for (int i = 0; i < num_libros; i++) {
-		// Usar fgets para leer cadenas y luego eliminar el salto de línea
-		fgets(biblioteca[i].titulo, MAX_STR, fp);
-		biblioteca[i].titulo[strcspn(biblioteca[i].titulo, "\n")] = 0;
+	liberar_memoria(); // Vaciar la lista actual antes de cargar una nueva
+	
+	int num_a_cargar;
+	fscanf(fp, "%d\n", &num_a_cargar);
+	
+	Libro temp_libro;
+	for (int i = 0; i < num_a_cargar; i++) {
+		fgets(temp_libro.titulo, MAX_STR, fp);
+		temp_libro.titulo[strcspn(temp_libro.titulo, "\n")] = 0;
 		
-		fgets(biblioteca[i].autor, MAX_STR, fp);
-		biblioteca[i].autor[strcspn(biblioteca[i].autor, "\n")] = 0;
+		fgets(temp_libro.autor, MAX_STR, fp);
+		temp_libro.autor[strcspn(temp_libro.autor, "\n")] = 0;
 		
-		fgets(biblioteca[i].codigo, MAX_STR, fp);
-		biblioteca[i].codigo[strcspn(biblioteca[i].codigo, "\n")] = 0;
+		fgets(temp_libro.codigo, MAX_STR, fp);
+		temp_libro.codigo[strcspn(temp_libro.codigo, "\n")] = 0;
 		
-		fscanf(fp, "%d\n", &biblioteca[i].estado);
+		fscanf(fp, "%d\n", &temp_libro.estado);
+		
+		agregar_libro_a_lista(temp_libro);
 	}
 	
 	fclose(fp);
-	printf("Datos cargados exitosamente desde %s.\n", FILENAME);
+	printf("Datos cargados exitosamente desde %s (%d libros).\n", FILENAME, num_libros_actual);
 }
 
 void gestionar_prestamos_activos() {
+	// ... (resto de la función igual) ...
 	int encontrados = 0;
+	NodoLibro *actual = lista_libros;
 	printf("\n--- Prestamos Activos ---\n");
-	for (int i = 0; i < num_libros; i++) {
-		if (biblioteca[i].estado == 1) { // Si el libro está prestado
+	while (actual != NULL) {
+		if (actual->datos.estado == 1) { // Si el libro está prestado
 			printf("  Titulo: %s, Autor: %s, Codigo: %s\n",
-				   biblioteca[i].titulo, biblioteca[i].autor, biblioteca[i].codigo);
+				   actual->datos.titulo, actual->datos.autor, actual->datos.codigo);
 			encontrados = 1;
 		}
+		actual = actual->siguiente;
 	}
 	if (!encontrados) {
 		printf("No hay prestamos activos en este momento.\n");
 	}
+}
+
+void liberar_memoria() {
+	// ... (resto de la función igual) ...
+	NodoLibro *actual = lista_libros;
+	NodoLibro *siguiente;
+	while (actual != NULL) {
+		siguiente = actual->siguiente;
+		free(actual);
+		actual = siguiente;
+	}
+	lista_libros = NULL;
+	num_libros_actual = 0;
+	printf("Memoria de la lista enlazada liberada.\n");
 }

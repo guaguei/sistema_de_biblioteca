@@ -1,6 +1,6 @@
 #include "biblioteca.h" // Incluye nuestra cabecera para acceder a las funciones de la biblioteca
 #include <stdio.h>      // Para printf, scanf
-#include <stdlib.h>     // Para system (limpiar pantalla)
+#include <stdlib.h>     // Para system (limpiar pantalla), exit
 
 // Prototipo de una función auxiliar para el main
 void mostrar_menu();
@@ -38,6 +38,7 @@ int main() {
 			break;
 		case 7:
 			guardar_datos(); // Guardar antes de salir
+			liberar_memoria(); // Liberar la memoria de la lista enlazada
 			printf("Gracias por usar el sistema de biblioteca. ¡Hasta luego!\n");
 			break;
 		default:
