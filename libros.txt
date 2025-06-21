@@ -1,27 +1,29 @@
+7
+La vuelta al mundo en 80 días
 Julio Verne
-456
+JV001
 0
-
+Cien años de soledad
 Gabriel García Márquez
-789
-0
-
-Miguel de Cervantes
-101
-0
-
+GGM002
+1
+El Principito
 Antoine de Saint-Exupéry
-102
+ASE003
 0
-
-Fiódor Dostoyevski
-103
-0
-
-Jane Austen
-104
-0
-
+1984
 George Orwell
-105
+GO004
+1
+Orgullo y Prejuicio
+Jane Austen
+JA005
+0
+Crimen y Castigo
+Fiódor Dostoyevski
+FD006
+1
+Don Quijote de la Mancha
+Miguel de Cervantes
+MC007
 0
