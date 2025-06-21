@@ -1,7 +1,7 @@
 #include "biblioteca.h" // Incluye la cabecera con definiciones y prototipos
 #include <stdio.h>      // Para entrada/salida (printf, scanf, fopen, fclose, etc.)
 #include <stdlib.h>     // Para funciones generales (malloc, free, qsort, exit)
-#include <string.h>     // Para manipulación de cadenas (strcpy, strcmp, strstr, strcspn)
+#include <string.h>     // Para manipulacion de cadenas (strcpy, strcmp, strstr, strcspn)
 
 // --- Variable Global para la cabeza de la Lista Enlazada ---
 static NodoLibro *lista_libros = NULL; // Puntero al primer nodo de la lista
@@ -14,9 +14,9 @@ static void agregar_libro_a_lista(Libro nuevo_libro);
 static NodoLibro* buscar_nodo_por_codigo(const char *codigo);
 static int comparar_por_titulo(const void *a, const void *b);
 static int comparar_por_autor(const void *a, const void *b);
-static void cargar_datos(); // <-- ¡Aquí está la solución para la advertencia!
+static void cargar_datos(); // <-- ¡Aqui esta la solucion para la advertencia!
 
-// --- Implementación de Funciones Auxiliares ---
+// --- Implementacion de Funciones Auxiliares ---
 static void limpiar_buffer() {
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
@@ -32,7 +32,7 @@ static void agregar_libro_a_lista(Libro nuevo_libro) {
 	nuevo_nodo->datos = nuevo_libro;
 	nuevo_nodo->siguiente = NULL;
 	
-	if (lista_libros == NULL) { // Si la lista está vacía
+	if (lista_libros == NULL) { // Si la lista esta vacia
 		lista_libros = nuevo_nodo;
 	} else { // Recorrer hasta el final y añadir
 		NodoLibro *actual = lista_libros;
@@ -68,14 +68,14 @@ static int comparar_por_autor(const void *a, const void *b) {
 }
 
 
-// --- Implementación de Funciones Públicas (desde biblioteca.h) ---
+// --- Implementacion de Funciones Publicas (desde biblioteca.h) ---
 
 void inicializar_sistema() {
-	cargar_datos(); // La llamada a cargar_datos() ahora está bien porque su prototipo está arriba
+	cargar_datos(); // La llamada a cargar_datos() ahora esta bien porque su prototipo esta arriba
 }
 
 void registrar_libro() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	Libro nuevo_libro;
 	
 	printf("\n--- Registrar Nuevo Libro ---\n");
@@ -98,7 +98,7 @@ void registrar_libro() {
 }
 
 void prestar_devolver_libro(int es_prestamo) {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	char codigo_buscar[MAX_STR];
 	NodoLibro *libro_encontrado;
 	
@@ -131,7 +131,7 @@ void prestar_devolver_libro(int es_prestamo) {
 }
 
 void buscar_libro() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	char termino_busqueda[MAX_STR];
 	int encontrado = 0;
 	NodoLibro *actual = lista_libros;
@@ -159,7 +159,7 @@ void buscar_libro() {
 }
 
 void listar_libros() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	if (lista_libros == NULL) {
 		printf("No hay libros registrados en la biblioteca.\n");
 		return;
@@ -172,7 +172,7 @@ void listar_libros() {
 	printf("2. Autor\n");
 	printf("Ingrese su opcion de ordenamiento: ");
 	scanf("%d", &opcion_orden);
-	limpiar_buffer(); // Limpiar el buffer después de leer un entero
+	limpiar_buffer(); // Limpiar el buffer despues de leer un entero
 	
 	Libro *temp_array = (Libro *)malloc(num_libros_actual * sizeof(Libro));
 	if (temp_array == NULL) {
@@ -208,7 +208,7 @@ void listar_libros() {
 }
 
 void guardar_datos() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	FILE *fp = fopen(FILENAME, "w");
 	if (fp == NULL) {
 		printf("ERROR: No se pudo abrir el archivo para guardar datos.\n");
@@ -230,7 +230,7 @@ void guardar_datos() {
 	printf("Datos guardados exitosamente en %s.\n", FILENAME);
 }
 
-static void cargar_datos() { // <-- Ahora es static aquí, como una función auxiliar
+static void cargar_datos() { // <-- Ahora es static aqui, como una funcion auxiliar
 	FILE *fp = fopen(FILENAME, "r");
 	if (fp == NULL) {
 		printf("Advertencia: No se encontraron datos previos (%s). Iniciando con biblioteca vacia.\n", FILENAME);
@@ -264,12 +264,12 @@ static void cargar_datos() { // <-- Ahora es static aquí, como una función auxil
 }
 
 void gestionar_prestamos_activos() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	int encontrados = 0;
 	NodoLibro *actual = lista_libros;
 	printf("\n--- Prestamos Activos ---\n");
 	while (actual != NULL) {
-		if (actual->datos.estado == 1) { // Si el libro está prestado
+		if (actual->datos.estado == 1) { // Si el libro esta prestado
 			printf("  Titulo: %s, Autor: %s, Codigo: %s\n",
 				   actual->datos.titulo, actual->datos.autor, actual->datos.codigo);
 			encontrados = 1;
@@ -282,7 +282,7 @@ void gestionar_prestamos_activos() {
 }
 
 void liberar_memoria() {
-	// ... (resto de la función igual) ...
+	// ... (resto de la funcion igual) ...
 	NodoLibro *actual = lista_libros;
 	NodoLibro *siguiente;
 	while (actual != NULL) {
@@ -292,5 +292,5 @@ void liberar_memoria() {
 	}
 	lista_libros = NULL;
 	num_libros_actual = 0;
-	printf("El sistema de la biblioteca esta listo para una nueva operacion.\n");
+	printf("El sistema de la biblioteca esta listo para una nueva operacion.\n"); 
 }

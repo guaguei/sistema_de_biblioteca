@@ -1,21 +1,21 @@
-#include "biblioteca.h" // Incluye nuestra cabecera para acceder a las funciones de la biblioteca
-#include <stdio.h>      // Para printf, scanf
-#include <stdlib.h>     // Para system (limpiar pantalla), exit
+#include "biblioteca.h" // Incluye nuestra cabecera para acceder a las funciones de la biblioteca 
+#include <stdio.h>      // Para printf, scanf 
+#include <stdlib.h>     // Para system (limpiar pantalla), exit 
 
-// Prototipo de una función auxiliar para el main
+// Prototipo de una funcion auxiliar para el main
 void mostrar_menu();
 static void limpiar_buffer_main(); // Auxiliar para limpiar buffer en main
 
 int main() {
 	int opcion;
 	
-	inicializar_sistema(); // Cargar los datos de la biblioteca al iniciar
+	inicializar_sistema(); // Cargar los datos de la biblioteca al iniciar 
 	
 	do {
 		mostrar_menu();
 		printf("Ingrese su opcion: ");
 		scanf("%d", &opcion);
-		limpiar_buffer_main(); // Limpiar el buffer después de leer un entero
+		limpiar_buffer_main(); // Limpiar el buffer despues de leer un entero
 		
 		switch (opcion) {
 		case 1:
@@ -53,7 +53,7 @@ int main() {
 	return 0;
 }
 
-// --- Implementación de Funciones Auxiliares para main.c ---
+// --- Implementacion de Funciones Auxiliares para main.c ---
 void mostrar_menu() {
 	printf("--- Sistema de Biblioteca ---\n");
 	printf("1. Registrar nuevo libro\n");
