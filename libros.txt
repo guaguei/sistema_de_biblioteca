@@ -1,14 +1,14 @@
 7
-La vuelta al mundo en 80 días
+La vuelta al mundo en 80 dias
 Julio Verne
 JV001
 0
-Cien años de soledad
-Gabriel García Márquez
+Cien anos de soledad
+Gabriel Garcia Marquez
 GGM002
 1
 El Principito
-Antoine de Saint-Exupéry
+Antoine de Saint-Exupery
 ASE003
 0
 1984
@@ -20,7 +20,7 @@ Jane Austen
 JA005
 0
 Crimen y Castigo
-Fiódor Dostoyevski
+Fiodor Dostoievski
 FD006
 1
 Don Quijote de la Mancha

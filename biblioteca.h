@@ -2,7 +2,7 @@
 #define BIBLIOTECA_H
 
 // --- Constantes ---
-#define MAX_STR 100    // Longitud máxima para cadenas (títulos, autores, códigos)
+#define MAX_STR 100    // Longitud maxima para cadenas (titulos, autores, codigos)
 #define FILENAME "libros.txt" // Nombre del archivo para guardar/cargar datos
 
 // --- Estructura para representar un Libro ---
