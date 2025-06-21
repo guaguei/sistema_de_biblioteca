@@ -292,5 +292,5 @@ void liberar_memoria() {
 	}
 	lista_libros = NULL;
 	num_libros_actual = 0;
-	printf("Memoria de la lista enlazada liberada.\n");
+	printf("El sistema de la biblioteca esta listo para una nueva operacion.\n");
 }
